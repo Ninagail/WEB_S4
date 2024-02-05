@@ -5,6 +5,7 @@
   margin: 0 auto;
   padding: 2rem;
   font-weight: normal;
+  text-align: center;
 }
 
 a,
@@ -32,4 +33,16 @@ a,
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }
+
+
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  padding: 10px;
+  background-color: #333;
 }
