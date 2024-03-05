@@ -1,22 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Quiz from './components/Quiz.vue';
-import Cinema from './components/Cinema.vue';
-// Importez d'autres composants pour d'autres catégories de quiz
+import HomePage from './pages/HomePage.vue';
+import CinemaPage from './pages/CinemaPage.vue';
+
 
 const routes = [
     {
         path: '/',
-        redirect: '/quiz' // Redirige '/' vers '/quiz'
+        component: HomePage,
+        name : 'HomePage'
     },
+        
     {
-        path: '/quiz',
-        component: Quiz
+        path: '/cinema',
+        component: CinemaPage,
+        name : 'CinemaPage'
     },
-    {
-        path: '/tv-cinema',
-        component: Cinema
-    },
-    // Ajoutez d'autres routes pour d'autres catégories de quiz
+    
 ];
 
 const router = createRouter({
