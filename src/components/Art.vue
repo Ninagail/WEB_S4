@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>Quiz Cinéma et TV</h2>
+        <h2>Quiz Art et littérature</h2>
         <div v-if="loading">Chargement...</div>
         <div v-else>
             <div v-for="(question, index) in quizQuestions" :key="index">
@@ -24,7 +24,7 @@ import { ref } from 'vue';
 import { getQuizQuestions } from '../services/api/quizAPI.js';
 
 export default {
-    name: 'Cinema',
+    name: 'Art',
     setup() {
         const quizQuestions = ref([]);
         const loading = ref(true);
@@ -32,7 +32,7 @@ export default {
 
         const fetchQuizQuestions = async () => {
             try {
-                const data = await getQuizQuestions(10, 'tv_cinema', 'facile'); // Modifier les paramètres selon tes besoins
+                const data = await getQuizQuestions(10, 'art_litterature', 'facile'); // Modifier les paramètres selon tes besoins
                 quizQuestions.value = data.quizzes.map(quiz => {
                     return {
                         question: quiz.question,

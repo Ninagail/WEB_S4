@@ -1,7 +1,7 @@
 <template>
     <div>
         <Menu />
-        <Art />
+        <Musique />
         <Footer />
     </div>
 </template>
@@ -9,14 +9,14 @@
 <script>
 import Menu from '../components/Menu.vue';
 import Footer from '../components/Footer.vue';
-import Art from '../components/Art.vue';
+import Musique from '../components/Musique.vue';
 
 export default {
-    name: "ArtPage",
+    name: "MusiquePage",
     components: {
         Menu,
         Footer,
-        Art,
+        Musique,
 
     },
 

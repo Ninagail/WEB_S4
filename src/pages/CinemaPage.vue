@@ -2,8 +2,8 @@
     <div>
         <Menu />
         <Cinema />
+        <Footer />
     </div>
-    <Footer />
 </template>
 
 <script>

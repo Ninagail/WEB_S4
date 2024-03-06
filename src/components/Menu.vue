@@ -4,7 +4,7 @@
         <div class="buttons">
             <router-link class="button" to="/cinema">Cinéma</router-link>
             <router-link class="button" to="/art">Art</router-link>
-            <button class="button">Musique</button>
+            <router-link class="button" to="/musique">Musique</router-link>
         </div>
 
 
@@ -45,7 +45,7 @@ export default {
 }
 
 .button:hover {
-    background-color: #45a049;
+    background-color: #28862d;
 }
 
 h1 {
