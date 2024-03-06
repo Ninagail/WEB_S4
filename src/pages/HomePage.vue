@@ -1,6 +1,6 @@
 <template>
     <Menu />
-    <Bienvenue />
+    <Bienvenue :bestScores="bestScores" />
     <Footer />
 </template>
 
@@ -15,6 +15,15 @@ export default {
         Menu,
         Bienvenue,
         Footer
+    },
+    data() {
+        return {
+            bestScores: {
+                cinema: localStorage.getItem('cinema'),
+                art: localStorage.getItem('art'),
+                musique: localStorage.getItem('musique')
+            }
+        };
     }
 }
 </script>

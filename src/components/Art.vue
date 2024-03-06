@@ -1,57 +1,41 @@
 <template>
-    <div>
-        <h2>Quiz Art et littérature</h2>
-        <div v-if="loading">Chargement...</div>
-        <div v-else>
-            <div v-for="(question, index) in quizQuestions" :key="index">
-                <h3>{{ question.question }}</h3>
-                <ul>
-                    <li v-for="(option, i) in question.options" :key="i">
-                        <label>
-                            <input type="radio" :value="option" v-model="selectedAnswers[index]">
-                            {{ option }}
-                        </label>
-                    </li>
-                </ul>
-            </div>
-            <button @click="submitQuiz">Soumettre</button>
-        </div>
-    </div>
+    <Quiz :title="title" :questions="questions" :loading="loading" category="art_litterature" />
 </template>
 
 <script>
+import Quiz from '../components/Quiz.vue';
 import { ref } from 'vue';
 import { getQuizQuestions } from '../services/api/quizAPI.js';
 
 export default {
-    name: 'Art',
+    components: {
+        Quiz
+    },
     setup() {
-        const quizQuestions = ref([]);
+        const title = ref('Quiz Art et Litterature');
+        const questions = ref([]);
         const loading = ref(true);
-        const selectedAnswers = ref([]);
 
         const fetchQuizQuestions = async () => {
             try {
-                const data = await getQuizQuestions(10, 'art_litterature', 'facile'); // Modifier les paramètres selon tes besoins
-                quizQuestions.value = data.quizzes.map(quiz => {
+                const data = await getQuizQuestions(3, 'art_litterature', 'facile');
+                questions.value = data.quizzes.map(quiz => {
                     return {
                         question: quiz.question,
                         options: [quiz.answer, ...quiz.badAnswers],
+                        correctAnswer: quiz.answer
                     };
                 });
                 loading.value = false;
+                console.log(questions.value);
             } catch (error) {
                 console.error("Erreur lors de la récupération des questions du quiz :", error);
             }
         };
 
-        const submitQuiz = () => {
-            console.log('Selected answers:', selectedAnswers.value);
-        };
-
         fetchQuizQuestions();
 
-        return { quizQuestions, loading, selectedAnswers, submitQuiz };
-    },
+        return { title, questions, loading };
+    }
 };
 </script>
