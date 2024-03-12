@@ -1,41 +1,156 @@
 <template>
-    <Quiz :title="title" :questions="questions" :loading="loading" category="art_litterature" />
+    <div>
+        <h2>{{ loading ? 'Chargement...' : title }}</h2>
+        <div v-if="!loading">
+            <div>
+                <label for="difficulty">Choisissez le niveau de difficulté :</label>
+                <select id="difficulty" v-model="selectedDifficulty" @change="fetchQuizQuestions">
+                    <option value="facile">Facile</option>
+                    <option value="normal">Normal</option>
+                    <option value="difficile">Difficile</option>
+                </select>
+            </div>
+            <div v-if="currentQuestionIndex < questions.length">
+                <h3>{{ questions[currentQuestionIndex].question }}</h3>
+                <ul>
+                    <li v-for="(option, i) in questions[currentQuestionIndex].options" :key="i">
+                        <button
+                            :class="{ 'selected': selectedAnswer === option, 'correct': selectedAnswer === option && option === questions[currentQuestionIndex].correctAnswer, 'incorrect': selectedAnswer === option && option !== questions[currentQuestionIndex].correctAnswer }"
+                            @click="selectAnswer(option)" :disabled="selectedAnswer">
+                            {{ option }}
+                        </button>
+                    </li>
+                </ul>
+                <button class="nextButton" @click="nextQuestion">
+                    {{ currentQuestionIndex === questions.length - 1 ? 'Terminer' : 'Question suivante' }}
+                </button>
+            </div>
+            <div v-else>
+                <p>Résultat du quiz:</p>
+                <p>Score: {{ calculateScore() }}</p>
+                <p class="message">{{ scoreMessage }}</p>
+                <button class="nextButton" @click="resetQuiz">Recommencer</button>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
-import Quiz from '../components/Quiz.vue';
 import { ref } from 'vue';
 import { getQuizQuestions } from '../services/api/quizAPI.js';
+import { shuffleArray } from '../utils/quizUtils.js';
 
 export default {
-    components: {
-        Quiz
-    },
     setup() {
-        const title = ref('Quiz Art et Litterature');
+        const title = ref('Quiz Art et Littérature');
         const questions = ref([]);
         const loading = ref(true);
+        const selectedDifficulty = ref('facile');
+        const selectedAnswer = ref(null);
+        const currentQuestionIndex = ref(0);
+        const score = ref(0);
+        const scoreMessage = ref('');
+        const quizSubmitted = ref(false);
 
         const fetchQuizQuestions = async () => {
             try {
-                const data = await getQuizQuestions(3, 'art_litterature', 'facile');
+                loading.value = true;
+
+                const data = await getQuizQuestions(2, 'art_litterature', selectedDifficulty.value);
                 questions.value = data.quizzes.map(quiz => {
+                    const shuffledOptions = shuffleArray([quiz.answer, ...quiz.badAnswers]);
                     return {
                         question: quiz.question,
-                        options: [quiz.answer, ...quiz.badAnswers],
+                        options: shuffledOptions,
                         correctAnswer: quiz.answer
                     };
                 });
+
                 loading.value = false;
                 console.log(questions.value);
+
             } catch (error) {
                 console.error("Erreur lors de la récupération des questions du quiz :", error);
+                loading.value = false;
             }
         };
 
+        const nextQuestion = () => {
+            if (currentQuestionIndex.value < questions.value.length - 1) {
+                currentQuestionIndex.value++;
+                selectedAnswer.value = null;
+            } else {
+                currentQuestionIndex.value = questions.value.length;
+                submitQuiz();
+            }
+        };
+
+        const selectAnswer = (option) => {
+            selectedAnswer.value = option;
+            if (option === questions.value[currentQuestionIndex.value].correctAnswer) {
+                score.value++;
+            }
+        };
+
+        const calculateScore = () => {
+            return score.value;
+        };
+
+        const setScoreMessage = () => {
+            const percentage = (score.value / questions.value.length) * 100;
+            if (percentage >= 80) {
+                scoreMessage.value = "Bravo ! Tu es un expert.";
+            } else if (percentage >= 50) {
+                scoreMessage.value = "Tu pourras faire mieux la prochaine fois.";
+            } else {
+                scoreMessage.value = "Hmm, tu devrais revoir tes classiques.";
+            }
+        };
+
+        const submitQuiz = () => {
+            if (currentQuestionIndex.value === questions.value.length && !quizSubmitted.value) {
+
+                const category = 'art';
+                const bestScore = localStorage.getItem(`bestScore_${category}`);
+                const newScore = calculateScore();
+
+                if (!bestScore || newScore > parseInt(bestScore)) {
+                    localStorage.setItem(`bestScore_${category}`, newScore);
+                }
+
+                quizSubmitted.value = true;
+            }
+        };
+
+        const resetQuiz = () => {
+            window.location.reload();
+        };
+
+
+
         fetchQuizQuestions();
 
-        return { title, questions, loading };
+        return {
+            title,
+            questions,
+            loading,
+            selectedDifficulty,
+            selectedAnswer,
+            currentQuestionIndex,
+            score,
+            scoreMessage,
+            nextQuestion,
+            selectAnswer,
+            calculateScore,
+            setScoreMessage,
+            submitQuiz,
+            resetQuiz,
+            fetchQuizQuestions
+        };
     }
 };
 </script>
+
+<style>
+@import '../assets/quiz.css';
+</style>

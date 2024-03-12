@@ -1,22 +1,28 @@
 <template>
     <div>
-        <h2>{{ title }}</h2>
-        <h2>{{ loading }}</h2>
-        <div v-if="loading">Chargement...</div>
-        <div v-else>
-            <div v-if="currentQuestionIndex < quizQuestions.length">
-                <h3>{{ quizQuestions[currentQuestionIndex].question }}</h3>
+        <h2>{{ loading ? 'Chargement...' : title }}</h2>
+        <div v-if="!loading">
+            <div>
+                <label for="difficulty">Choisissez le niveau de difficulté :</label>
+                <select id="difficulty" v-model="selectedDifficulty" @change="fetchQuizQuestions">
+                    <option value="facile">Facile</option>
+                    <option value="normal">Normal</option>
+                    <option value="difficile">Difficile</option>
+                </select>
+            </div>
+            <div v-if="currentQuestionIndex < questions.length">
+                <h3>{{ questions[currentQuestionIndex].question }}</h3>
                 <ul>
-                    <li v-for="(option, i) in quizQuestions[currentQuestionIndex].options" :key="i">
+                    <li v-for="(option, i) in questions[currentQuestionIndex].options" :key="i">
                         <button
-                            :class="{ 'selected': selectedAnswer === option, 'correct': selectedAnswer === option && option === quizQuestions[currentQuestionIndex].correctAnswer, 'incorrect': selectedAnswer === option && option !== quizQuestions[currentQuestionIndex].correctAnswer }"
+                            :class="{ 'selected': selectedAnswer === option, 'correct': selectedAnswer === option && option === questions[currentQuestionIndex].correctAnswer, 'incorrect': selectedAnswer === option && option !== questions[currentQuestionIndex].correctAnswer }"
                             @click="selectAnswer(option)" :disabled="selectedAnswer">
                             {{ option }}
                         </button>
                     </li>
                 </ul>
                 <button class="nextButton" @click="nextQuestion">
-                    {{ currentQuestionIndex === quizQuestions.length - 1 ? 'Terminer' : 'Question suivante' }}
+                    {{ currentQuestionIndex === questions.length - 1 ? 'Terminer' : 'Question suivante' }}
                 </button>
             </div>
             <div v-else>
@@ -31,12 +37,14 @@
 
 <script>
 import { ref } from 'vue';
+import { getQuizQuestions } from '../services/api/quizAPI.js';
+import { shuffleArray } from '../utils/quizUtils.js';
 
 export default {
     props: {
         title: String,
         questions: Array,
-        loading: Boolean 
+        loading: Boolean
     },
     setup(props) {
         const quizQuestions = ref(props.questions);
@@ -44,7 +52,7 @@ export default {
         const currentQuestionIndex = ref(0);
         const score = ref(0);
         const scoreMessage = ref('');
-        const quizCompleted = ref(false); 
+        const quizCompleted = ref(false);
         const quizSubmitted = ref(false);
 
         const nextQuestion = () => {
@@ -64,9 +72,7 @@ export default {
             }
         };
 
-        const calculateScore = () => {
-            return score.value;
-        };
+
 
         const setScoreMessage = () => {
             const percentage = (score.value / quizQuestions.value.length) * 100;
@@ -79,13 +85,7 @@ export default {
             }
         };
 
-        const submitQuiz = () => {
-            if (currentQuestionIndex.value === quizQuestions.value.length && !quizSubmitted.value) {
-                setScoreMessage();
-                emit('quizCompleted', score.value);
-                quizSubmitted.value = true;
-            }
-        };
+
 
         const resetQuiz = () => {
             window.location.reload();
@@ -110,42 +110,5 @@ export default {
 </script>
 
 <style>
-.container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 20px;
-}
-
-.correct {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.incorrect {
-    background-color: #af4c56;
-    color: white;
-}
-
-button {
-    margin: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-}
-
-.nextButton {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    border-radius: 10px;
-    font-size: 16px;
-    margin: 16px 16px;
-    cursor: pointer;
-}
+@import '../assets/quiz.css';
 </style>

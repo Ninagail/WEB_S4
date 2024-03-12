@@ -22,9 +22,9 @@ export default {
     data() {
         return {
             bestScores: {
-                cinema: localStorage.getItem('cinema'),
-                art: localStorage.getItem('art'),
-                musique: localStorage.getItem('musique')
+                cinema: localStorage.getItem('bestScore_tv_cinema'),
+                art: localStorage.getItem('bestScore_art'),
+                musique: localStorage.getItem('bestScore_musique')
             }
         };
     }
