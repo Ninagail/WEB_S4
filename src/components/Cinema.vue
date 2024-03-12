@@ -1,5 +1,6 @@
 <template>
     <Quiz :title="title" :questions="questions" :loading="loading" category="tv_cinema" />
+    <h2>{{ loading }}</h2>
 </template>
 
 <script>
@@ -11,10 +12,21 @@ export default {
     components: {
         Quiz
     },
+
+
     setup() {
         const title = ref('Quiz Cinéma et TV');
         const questions = ref([]);
         const loading = ref(true);
+
+        const handleQuizCompleted = (score) => {
+            const category = 'tv_cinema';
+            const bestScore = localStorage.getItem(`bestScore_${category}`);
+            if (!bestScore || score > parseInt(bestScore)) {
+                localStorage.setItem(`bestScore_${category}`, score);
+            }
+            console.log('Quiz completed with score:', score);
+        };
 
         const fetchQuizQuestions = async () => {
             try {
@@ -27,7 +39,6 @@ export default {
                     };
                 });
 
-                //selectedAnswers.value = Array(questions.value.length).fill(null);
                 loading.value = false;
                 console.log(questions.value);
 
@@ -37,10 +48,9 @@ export default {
             }
         };
 
-
         fetchQuizQuestions();
 
-        return { title, questions, loading };
+        return { title, questions, loading, handleQuizCompleted };
     }
 };
 </script>

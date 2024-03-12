@@ -10,6 +10,7 @@
 import Menu from '../components/Menu.vue';
 import Footer from '../components/Footer.vue';
 import Cinema from '../components/Cinema.vue';
+import Quiz from '../components/Quiz.vue';
 
 export default {
     name: "CinemaPage",
@@ -17,9 +18,10 @@ export default {
         Menu,
         Footer,
         Cinema,
-
+        Quiz
     },
+
+
 
 }
 </script>
-

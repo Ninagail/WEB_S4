@@ -26,7 +26,7 @@ export default {
 
 <style>
 .nav-background {
-    padding: 20px;
+    padding: 40px;
     text-align: center;
 }
 
@@ -68,10 +68,5 @@ export default {
 
 .button-quizz:hover {
     background-color: #dc0a7a;
-}
-
-h1 {
-    font-size: 2em;
-    justify-content: center;
 }
 </style>

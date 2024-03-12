@@ -1,12 +1,14 @@
 <template>
     <Menu />
-    <Bienvenue :bestScores="bestScores" />
+    <Bienvenue />
+    <Score :bestScores="bestScores" />
     <Footer />
 </template>
 
 <script>
 import Menu from '../components/Menu.vue';
 import Bienvenue from '../components/Bienvenue.vue';
+import Score from '../components/Score.vue';
 import Footer from '../components/Footer.vue';
 
 export default {
@@ -14,6 +16,7 @@ export default {
     components: {
         Menu,
         Bienvenue,
+        Score,
         Footer
     },
     data() {
