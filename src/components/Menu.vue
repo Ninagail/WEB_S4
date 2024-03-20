@@ -26,7 +26,7 @@ export default {
 
 <style>
 .nav-background {
-    padding: 40px;
+    padding: 10px;
     text-align: center;
 }
 

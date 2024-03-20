@@ -10,6 +10,14 @@
                     <option value="difficile">Difficile</option>
                 </select>
             </div>
+            <div>
+                <label for="questionCount">Nombre de questions (10 max) : </label>
+                <input type="number" id="questionCount" v-model.number="selectedQuestionCount" min="1" max="10">
+                <button @click="startQuiz">Commencer le quiz</button>
+            </div>
+            <div>
+                <ProgressBar :current="currentQuestionIndex" :total="questions.length" />
+            </div>
             <div v-if="currentQuestionIndex < questions.length">
                 <h3>{{ questions[currentQuestionIndex].question }}</h3>
                 <ul>
@@ -25,12 +33,13 @@
                     {{ currentQuestionIndex === questions.length - 1 ? 'Terminer' : 'Question suivante' }}
                 </button>
             </div>
-            <div v-else>
+            <div v-else-if="questions.length > 0">
                 <p>Résultat du quiz:</p>
                 <p>Score: {{ calculateScore() }}</p>
                 <p class="message">{{ scoreMessage }}</p>
                 <button class="nextButton" @click="resetQuiz">Recommencer</button>
             </div>
+
         </div>
     </div>
 </template>
@@ -39,8 +48,13 @@
 import { ref } from 'vue';
 import { getQuizQuestions } from '../services/api/quizAPI.js';
 import { shuffleArray } from '../utils/quizUtils.js';
+import ProgressBar from './ProgressBar.vue';
 
 export default {
+    components: {
+        ProgressBar
+    },
+
     setup() {
         const title = ref('Quiz Art et Littérature');
         const questions = ref([]);
@@ -51,12 +65,27 @@ export default {
         const score = ref(0);
         const scoreMessage = ref('');
         const quizSubmitted = ref(false);
+        const selectedQuestionCount = ref(10);
+        const maxQuestionCount = ref(10);
 
         const fetchQuizQuestions = async () => {
             try {
                 loading.value = true;
 
-                const data = await getQuizQuestions(2, 'art_litterature', selectedDifficulty.value);
+                const amount = parseInt(selectedQuestionCount.value);
+                if (isNaN(amount) || amount <= 0) {
+                    console.error('Le nombre de questions doit être un entier positif.');
+                    loading.value = false;
+                    return;
+                }
+
+                if (amount > maxQuestionCount.value) {
+                    console.error('Le nombre de questions demandé dépasse la limite autorisée.');
+                    loading.value = false;
+                    return;
+                }
+
+                const data = await getQuizQuestions(amount, 'art_litterature', selectedDifficulty.value);
                 questions.value = data.quizzes.map(quiz => {
                     const shuffledOptions = shuffleArray([quiz.answer, ...quiz.badAnswers]);
                     return {
@@ -71,6 +100,20 @@ export default {
 
             } catch (error) {
                 console.error("Erreur lors de la récupération des questions du quiz :", error);
+                loading.value = false;
+            }
+        };
+
+        const startQuiz = async () => {
+            if (selectedQuestionCount.value > 10) {
+                selectedQuestionCount.value = 10;
+            }
+            loading.value = true;
+            try {
+                await fetchQuizQuestions(selectedDifficulty.value, selectedQuestionCount.value);
+            } catch (error) {
+                console.error("Erreur lors du chargement des questions :", error);
+            } finally {
                 loading.value = false;
             }
         };
@@ -127,7 +170,6 @@ export default {
         };
 
 
-
         fetchQuizQuestions();
 
         return {
@@ -145,10 +187,13 @@ export default {
             setScoreMessage,
             submitQuiz,
             resetQuiz,
-            fetchQuizQuestions
+            fetchQuizQuestions,
+            selectedQuestionCount,
+            startQuiz
         };
     }
 };
+
 </script>
 
 <style>
