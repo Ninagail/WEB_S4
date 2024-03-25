@@ -13,3 +13,19 @@ export default {
     name: "Footer"
 }
 </script>
+<style>
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+    background-color: #333;
+}
+
+@media screen and (max-height: 768px) {
+    footer {
+        position: static;
+    }
+}
+</style>

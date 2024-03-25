@@ -26,14 +26,25 @@ export default {
 
 <style>
 .nav-background {
-    padding: 10px;
+    padding: 5px;
     text-align: center;
 }
 
 .buttons {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button {
+        margin: 8px;
+    }
 }
 
 .button {
@@ -56,10 +67,10 @@ export default {
 }
 
 .button-quizz {
-    margin-bottom: 32px;
+    margin-bottom: 20px;
     background-color: #d05797;
     border: none;
-    padding: 30px 60px;
+    padding: 20px 50px;
     text-align: center;
     text-decoration: none;
     display: inline-block;

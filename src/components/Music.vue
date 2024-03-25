@@ -1,7 +1,7 @@
 <template>
     <div>
-        <h1>Quiz Cinéma</h1>
-        <Quiz category="tv_cinema" />
+        <h1>Quiz Musique</h1>
+        <Quiz category="musique" />
     </div>
 </template>
 

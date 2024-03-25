@@ -1,7 +1,9 @@
+@import './base.css';
+
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-gap: 20px;
+    grid-gap: 10px;
 }
 
 .correct {
@@ -20,6 +22,7 @@ button {
     cursor: pointer;
     border: none;
     border-radius: 5px;
+    text-align: center;
 }
 
 .nextButton {
@@ -30,9 +33,20 @@ button {
 
     text-align: center;
     text-decoration: none;
-    display: inline-block;
+
     border-radius: 10px;
     font-size: 16px;
     margin: 16px 16px;
     cursor: pointer;
+}
+
+li {
+    list-style-type: none;
+}
+
+a,
+.green {
+    text-decoration: none;
+    color: hsla(160, 100%, 37%, 1);
+    transition: 0.4s;
 }

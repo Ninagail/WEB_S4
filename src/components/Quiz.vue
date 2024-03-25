@@ -37,6 +37,9 @@
                 <p>Résultat du quiz:</p>
                 <p>Score: {{ calculateScore() }}</p>
                 <p class="message">{{ scoreMessage }}</p>
+                <!-- <img v-if="score.value >= 50" src="../assets/bravo.jpg.JPG" alt="Image1"
+                    style="width: 100px; height: auto;">
+                <img v-else src="../assets/bravo.jpg.JPG" alt="Image2" style="width: 100px; height: auto;"> -->
                 <button class="nextButton" @click="resetQuiz">Recommencer</button>
             </div>
         </div>
@@ -50,11 +53,18 @@ import { shuffleArray } from '../utils/quizUtils.js';
 import ProgressBar from './ProgressBar.vue';
 
 export default {
+    props: {
+        category: {
+            type: String,
+            required: true
+        },
+
+    },
     components: {
         ProgressBar
     },
-    setup() {
-        const title = ref('Quiz Musique');
+    setup(props) {
+        const title = ref('Quiz');
         const questions = ref([]);
         const loading = ref(true);
         const selectedDifficulty = ref('facile');
@@ -83,7 +93,7 @@ export default {
                     return;
                 }
 
-                const data = await getQuizQuestions(amount, 'musique', selectedDifficulty.value);
+                const data = await getQuizQuestions(amount, props.category, selectedDifficulty.value);
                 questions.value = data.quizzes.map(quiz => {
                     const shuffledOptions = shuffleArray([quiz.answer, ...quiz.badAnswers]);
                     return {
@@ -101,6 +111,7 @@ export default {
                 loading.value = false;
             }
         };
+
 
         const startQuiz = async () => {
             if (selectedQuestionCount.value > 10) {
@@ -150,15 +161,13 @@ export default {
 
         const submitQuiz = () => {
             if (currentQuestionIndex.value === questions.value.length && !quizSubmitted.value) {
-                // Calcul du score et message ici
-                const category = 'musique';
-                const bestScore = localStorage.getItem(`bestScore_${category}`);
+                const bestScore = localStorage.getItem(`bestScore_${props.category}`);
                 const newScore = calculateScore();
 
                 if (!bestScore || newScore > parseInt(bestScore)) {
-                    localStorage.setItem(`bestScore_${category}`, newScore);
+                    localStorage.setItem(`bestScore_${props.category}`, newScore);
                 }
-
+                setScoreMessage();
                 quizSubmitted.value = true;
             }
         };

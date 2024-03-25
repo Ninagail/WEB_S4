@@ -11,6 +11,5 @@ export default {
 </script>
 
 <style>
-@import './assets/main.css';
+@import './assets/quiz.css';
 </style>
-
