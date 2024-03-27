@@ -1,20 +1,20 @@
 <template>
     <div>
-        <Menu />
+        <Header />
         <Cinema />
         <Footer />
     </div>
 </template>
 
 <script>
-import Menu from '../components/Menu.vue';
+import Header from '../components/Header.vue';
 import Footer from '../components/Footer.vue';
 import Cinema from '../components/Cinema.vue';
 
 export default {
     name: "CinemaPage",
     components: {
-        Menu,
+        Header,
         Footer,
         Cinema,
     },

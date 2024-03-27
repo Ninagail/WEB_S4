@@ -1,21 +1,21 @@
 <template>
-    <Menu />
-    <Bienvenue />
+    <Header />
+    <Welcome />
     <Score :bestScores="bestScores" />
     <Footer />
 </template>
 
 <script>
-import Menu from '../components/Menu.vue';
-import Bienvenue from '../components/Bienvenue.vue';
+import Header from '../components/Header.vue';
+import Welcome from '../components/Welcome.vue';
 import Score from '../components/Score.vue';
 import Footer from '../components/Footer.vue';
 
 export default {
     name: "HomePage",
     components: {
-        Menu,
-        Bienvenue,
+        Header,
+        Welcome,
         Score,
         Footer
     },
@@ -24,7 +24,7 @@ export default {
             bestScores: {
                 cinema: localStorage.getItem('bestScore_tv_cinema'),
                 art: localStorage.getItem('bestScore_art'),
-                musique: localStorage.getItem('bestScore_musique')
+                music: localStorage.getItem('bestScore_musique')
             }
         };
     }

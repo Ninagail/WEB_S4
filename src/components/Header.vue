@@ -6,7 +6,7 @@
             <div class="buttons">
                 <router-link class="button" to="/cinema">Cinéma</router-link>
                 <router-link class="button" to="/art">Art</router-link>
-                <router-link class="button" to="/musique">Musique</router-link>
+                <router-link class="button" to="/music">Musique</router-link>
             </div>
         </nav>
         <link rel="stylesheet" href="main.css">
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-    name: 'Menu',
+    name: 'Header',
     methods: {
         goToHome() {
             this.$router.push('/');

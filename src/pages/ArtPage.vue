@@ -1,20 +1,20 @@
 <template>
     <div>
-        <Menu />
+        <Header />
         <Art />
         <Footer />
     </div>
 </template>
 
 <script>
-import Menu from '../components/Menu.vue';
+import Header from '../components/Header.vue';
 import Footer from '../components/Footer.vue';
 import Art from '../components/Art.vue';
 
 export default {
     name: "ArtPage",
     components: {
-        Menu,
+        Header,
         Footer,
         Art,
 

@@ -2,99 +2,88 @@
     <div>
         <h2>{{ loading ? 'Chargement...' : title }}</h2>
         <div v-if="!loading">
-            <div>
-                <label for="difficulty">Choisissez le niveau de difficulté :</label>
-                <select id="difficulty" v-model="selectedDifficulty" @change="fetchQuizQuestions">
-                    <option value="facile">Facile</option>
-                    <option value="normal">Normal</option>
-                    <option value="difficile">Difficile</option>
-                </select>
-            </div>
+            <QuizDifficultySelector :selectedDifficulty="selectedDifficulty"
+                @update:selectedDifficulty="updateSelectedDifficulty" :fetchQuizQuestions="fetchQuizQuestions" />
+
             <div>
                 <label for="questionCount">Nombre de questions (10 max) : </label>
                 <input type="number" id="questionCount" v-model.number="selectedQuestionCount" min="1" max="10">
                 <button @click="startQuiz">Commencer le quiz</button>
             </div>
-            <div>
-                <ProgressBar :current="currentQuestionIndex" :total="questions.length" />
-            </div>
-            <div v-if="currentQuestionIndex < questions.length">
-                <h3>{{ questions[currentQuestionIndex].question }}</h3>
-                <ul>
-                    <li v-for="(option, i) in questions[currentQuestionIndex].options" :key="i">
-                        <button
-                            :class="{ 'selected': selectedAnswer === option, 'correct': selectedAnswer === option && option === questions[currentQuestionIndex].correctAnswer, 'incorrect': selectedAnswer === option && option !== questions[currentQuestionIndex].correctAnswer }"
-                            @click="selectAnswer(option)" :disabled="selectedAnswer">
-                            {{ option }}
-                        </button>
-                    </li>
-                </ul>
-                <button class="nextButton" @click="nextQuestion">
-                    {{ currentQuestionIndex === questions.length - 1 ? 'Terminer' : 'Question suivante' }}
-                </button>
-            </div>
-            <div v-else-if="questions.length > 0">
-                <p>Résultat du quiz:</p>
-                <p>Score: {{ calculateScore() }}</p>
-                <p class="message">{{ scoreMessage }}</p>
-                <!-- <img v-if="score.value >= 50" src="../assets/bravo.jpg.JPG" alt="Image1"
-                    style="width: 100px; height: auto;">
-                <img v-else src="../assets/bravo.jpg.JPG" alt="Image2" style="width: 100px; height: auto;"> -->
-                <button class="nextButton" @click="resetQuiz">Recommencer</button>
-            </div>
+
+            <ProgressBar :current="currentQuestionIndex" :total="questions.length" />
+
+            <QuizQuestion v-if="currentQuestionIndex < questions.length" :currentQuestionIndex="currentQuestionIndex"
+                :questions="questions" :selectedAnswer="selectedAnswer" :selectAnswer="selectAnswer"
+                :nextQuestion="nextQuestion" />
+
+            <QuizResult v-else-if="questions.length > 0" :calculateScore="calculateScore" :scoreMessage="scoreMessage"
+                :showBlink="showBlink" :resetQuiz="resetQuiz" />
         </div>
     </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { getQuizQuestions } from '../services/api/quizAPI.js';
 import { shuffleArray } from '../utils/quizUtils.js';
 import ProgressBar from './ProgressBar.vue';
+import QuizDifficultySelector from './QuizDifficultySelector.vue';
+import QuizQuestion from './QuizQuestion.vue';
+import QuizResult from './QuizResult.vue';
 
 export default {
+    components: {
+        ProgressBar,
+        QuizDifficultySelector,
+        QuizQuestion,
+        QuizResult
+    },
     props: {
         category: {
             type: String,
             required: true
+        }
+    },
+    data() {
+        return {
+            loading: true,
+            title: 'Quiz',
+            questions: [],
+            selectedDifficulty: 'facile',
+            selectedAnswer: null,
+            currentQuestionIndex: 0,
+            score: 0,
+            scoreMessage: '',
+            quizSubmitted: false,
+            selectedQuestionCount: 10,
+            maxQuestionCount: 10,
+            showBlink: false
+        };
+    },
+    methods: {
+        updateSelectedDifficulty(value) {
+            this.selectedDifficulty = value;
         },
-
-    },
-    components: {
-        ProgressBar
-    },
-    setup(props) {
-        const title = ref('Quiz');
-        const questions = ref([]);
-        const loading = ref(true);
-        const selectedDifficulty = ref('facile');
-        const selectedAnswer = ref(null);
-        const currentQuestionIndex = ref(0);
-        const score = ref(0);
-        const scoreMessage = ref('');
-        const quizSubmitted = ref(false);
-        const selectedQuestionCount = ref(10);
-        const maxQuestionCount = ref(10);
-
-        const fetchQuizQuestions = async () => {
+        async fetchQuizQuestions() {
             try {
-                loading.value = true;
+                this.loading = true;
 
-                const amount = parseInt(selectedQuestionCount.value);
+                const amount = parseInt(this.selectedQuestionCount);
                 if (isNaN(amount) || amount <= 0) {
                     console.error('Le nombre de questions doit être un entier positif.');
-                    loading.value = false;
+                    this.loading = false;
                     return;
                 }
 
-                if (amount > maxQuestionCount.value) {
+                if (amount > this.maxQuestionCount) {
                     console.error('Le nombre de questions demandé dépasse la limite autorisée.');
-                    loading.value = false;
+                    this.loading = false;
                     return;
                 }
 
-                const data = await getQuizQuestions(amount, props.category, selectedDifficulty.value);
-                questions.value = data.quizzes.map(quiz => {
+                const data = await getQuizQuestions(amount, this.category, this.selectedDifficulty);
+                this.questions = data.quizzes.map(quiz => {
                     const shuffledOptions = shuffleArray([quiz.answer, ...quiz.badAnswers]);
                     return {
                         question: quiz.question,
@@ -103,106 +92,92 @@ export default {
                     };
                 });
 
-                loading.value = false;
-                console.log(questions.value);
-
+                this.loading = false;
             } catch (error) {
                 console.error("Erreur lors de la récupération des questions du quiz :", error);
-                loading.value = false;
+                this.loading = false;
             }
-        };
-
-
-        const startQuiz = async () => {
-            if (selectedQuestionCount.value > 10) {
-                selectedQuestionCount.value = 10;
+        },
+        startQuiz() {
+            if (this.selectedQuestionCount > 10) {
+                this.selectedQuestionCount = 10;
             }
-            loading.value = true;
-            try {
-                await fetchQuizQuestions(selectedDifficulty.value, selectedQuestionCount.value);
-            } catch (error) {
-                console.error("Erreur lors du chargement des questions :", error);
-            } finally {
-                loading.value = false;
-            }
-        };
-
-        const nextQuestion = () => {
-            if (currentQuestionIndex.value < questions.value.length - 1) {
-                currentQuestionIndex.value++;
-                selectedAnswer.value = null;
+            this.fetchQuizQuestions();
+        },
+        nextQuestion() {
+            if (this.currentQuestionIndex < this.questions.length - 1) {
+                this.currentQuestionIndex++;
+                this.selectedAnswer = null;
             } else {
-                currentQuestionIndex.value = questions.value.length;
-                submitQuiz();
+                this.currentQuestionIndex = this.questions.length;
+                this.submitQuiz();
             }
-        };
-
-        const selectAnswer = (option) => {
-            selectedAnswer.value = option;
-            if (option === questions.value[currentQuestionIndex.value].correctAnswer) {
-                score.value++;
+        },
+        selectAnswer(option) {
+            this.selectedAnswer = option;
+            if (option === this.questions[this.currentQuestionIndex].correctAnswer) {
+                this.score++;
             }
-        };
-
-        const calculateScore = () => {
-            return score.value;
-        };
-
-        const setScoreMessage = () => {
-            const percentage = (score.value / questions.value.length) * 100;
+        },
+        calculateScore() {
+            return this.score;
+        },
+        setScoreMessage() {
+            const percentage = (this.score / this.questions.length) * 100;
             if (percentage >= 80) {
-                scoreMessage.value = "Bravo ! Tu es un expert.";
+                this.scoreMessage = "Bravo ! Tu es un expert.";
             } else if (percentage >= 50) {
-                scoreMessage.value = "Tu pourras faire mieux la prochaine fois.";
+                this.scoreMessage = "Tu pourras faire mieux la prochaine fois.";
             } else {
-                scoreMessage.value = "Hmm, tu devrais revoir tes classiques.";
+                this.scoreMessage = "Hmm, tu devrais revoir tes classiques.";
             }
-        };
-
-        const submitQuiz = () => {
-            if (currentQuestionIndex.value === questions.value.length && !quizSubmitted.value) {
-                const bestScore = localStorage.getItem(`bestScore_${props.category}`);
-                const newScore = calculateScore();
+        },
+        submitQuiz() {
+            if (this.currentQuestionIndex === this.questions.length && !this.quizSubmitted) {
+                const bestScore = localStorage.getItem(`bestScore_${this.category}`);
+                const newScore = this.calculateScore();
 
                 if (!bestScore || newScore > parseInt(bestScore)) {
-                    localStorage.setItem(`bestScore_${props.category}`, newScore);
+                    localStorage.setItem(`bestScore_${this.category}`, newScore);
                 }
-                setScoreMessage();
-                quizSubmitted.value = true;
+                this.setScoreMessage();
+                this.quizSubmitted = true;
             }
-        };
-
-        const resetQuiz = () => {
+        },
+        resetQuiz() {
             window.location.reload();
-        };
-
-
-
-        fetchQuizQuestions();
-
-        return {
-            title,
-            questions,
-            loading,
-            selectedDifficulty,
-            selectedAnswer,
-            currentQuestionIndex,
-            score,
-            scoreMessage,
-            nextQuestion,
-            selectAnswer,
-            calculateScore,
-            setScoreMessage,
-            submitQuiz,
-            resetQuiz,
-            fetchQuizQuestions,
-            startQuiz,
-            selectedQuestionCount
-        };
+        }
+    },
+    watch: {
+        scoreMessage() {
+            this.showBlink = true;
+        }
+    },
+    async mounted() {
+        await this.fetchQuizQuestions();
     }
 };
 </script>
 
 <style>
 @import '../assets/quiz.css';
+</style>
+<style scoped>
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.blink {
+    animation: blink 2s infinite;
+}
 </style>

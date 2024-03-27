@@ -1,22 +1,22 @@
 <template>
     <div>
-        <Menu />
-        <Musique />
+        <Header />
+        <Music />
         <Footer />
     </div>
 </template>
 
 <script>
-import Menu from '../components/Menu.vue';
+import Header from '../components/Header.vue';
 import Footer from '../components/Footer.vue';
-import Musique from '../components/Musique.vue';
+import Music from '../components/Music.vue';
 
 export default {
-    name: "MusiquePage",
+    name: "MusicPage",
     components: {
-        Menu,
+        Header,
         Footer,
-        Musique,
+        Music,
 
     },
 

@@ -8,7 +8,15 @@
 
 <script>
 export default {
-    name: 'Bienvenue',
+    name: 'Welcome',
 
 }
 </script>
+<style scoped>
+h1 {
+
+    font-size: 2em;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+</style>

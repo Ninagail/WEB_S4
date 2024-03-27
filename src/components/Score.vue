@@ -13,3 +13,11 @@ export default {
 
 }
 </script>
+<style scoped>
+li {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    height: 2rem;
+
+}
+</style>
