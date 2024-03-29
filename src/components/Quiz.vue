@@ -18,7 +18,7 @@
                 :nextQuestion="nextQuestion" />
 
             <QuizResult v-else-if="questions.length > 0" :calculateScore="calculateScore" :scoreMessage="scoreMessage"
-                :showBlink="showBlink" :resetQuiz="resetQuiz" />
+                :resetQuiz="resetQuiz" />
         </div>
     </div>
 </template>
@@ -58,7 +58,6 @@ export default {
             quizSubmitted: false,
             selectedQuestionCount: 10,
             maxQuestionCount: 10,
-            showBlink: false
         };
     },
     methods: {
@@ -148,11 +147,7 @@ export default {
             window.location.reload();
         }
     },
-    watch: {
-        scoreMessage() {
-            this.showBlink = true;
-        }
-    },
+
     async mounted() {
         await this.fetchQuizQuestions();
     }
@@ -161,23 +156,4 @@ export default {
 
 <style>
 @import '../assets/quiz.css';
-</style>
-<style scoped>
-@keyframes blink {
-    0% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-.blink {
-    animation: blink 2s infinite;
-}
 </style>

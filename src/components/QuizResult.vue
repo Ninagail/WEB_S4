@@ -9,7 +9,7 @@
 
         <p>Résultat du quiz:</p>
         <p>Score: {{ calculateScore() }}</p>
-        <p class="message" :class="{ 'blink': showBlink }">{{ scoreMessage }}</p>
+        <p class="message">{{ scoreMessage }}</p>
 
         <button class="nextButton" @click="resetQuiz">Recommencer</button>
     </div>
@@ -21,7 +21,6 @@ export default {
     props: {
         calculateScore: Function,
         scoreMessage: String,
-        showBlink: Boolean,
         resetQuiz: Function
     },
     components: {
