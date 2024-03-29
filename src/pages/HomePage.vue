@@ -23,7 +23,7 @@ export default {
         return {
             bestScores: {
                 cinema: localStorage.getItem('bestScore_tv_cinema'),
-                art: localStorage.getItem('bestScore_art'),
+                art: localStorage.getItem('bestScore_art_litterature'),
                 music: localStorage.getItem('bestScore_musique')
             }
         };
